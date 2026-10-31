@@ -1,0 +1,37 @@
+module keypress(
+        input logic clk,
+        input logic reset,
+        input logic [3:0] key,
+        input logic [15:0] keyMap, initKeyMap,
+		output logic scan_en, disp_en, save, fetch,
+        output logic [15:0] saveKeyMap
+    );
+
+    logic capture;
+    logic any_key;
+
+    assign any_key = $onehot(keyMap); // low-asserted: any column pulled down
+	
+    typedef enum logic [3:0] {SCAN = 4'b0001, PRESS = 4'b0010,
+    HOLD = 4'b0100, MULTIPRESS = 4'b1000} statetype;
+    statetype state, nextstate;
+
+    always_ff @(posedge clk, negedge reset)
+        if (~reset) state <= SCAN;
+        else state <= nextstate;
+
+    always_comb
+        case (state)
+            SCAN: nextstate = any_key ? PRESS : SCAN;
+            PRESS: nextstate = HOLD;
+            HOLD: nextstate = (keyMap == 16'b0) ? SCAN : ( (~any_key)? MULTIPRESS : HOLD);
+            MULTIPRESS: nextSTate = (keyMap == 16'b0) ? SCAN : ((initKeyMap == keyMap) ? HOLD : ((any_key) ? PRESS : MULTIPRESS));
+            default: nextstate = SCAN;
+        endcase
+
+    assign disp_en = (state == DISPLAY);
+    assign scan_en = (state == SCAN);
+    assign save = (state == PRESS);
+    assign fetch = (state == MULTIPRESS);
+    assign saveKeyMap = (state == PRESS) ? keyMap: 16'b0;
+endmodule
