@@ -6,8 +6,8 @@ module scanner (
             output logic[3:0] rowSelect, 
             output logic[3:0] count);
         // logic [3:0] count;
-        counter #(3, 12) counter(clk, reset, enable, count);
+        counter #(3, 15) counter(clk, reset, enable, count);
 
-        assign rowSelect = {count < 3, (count >= 3) && (count < 6), (count >= 6) && (count < 9), count >= 9};
+        assign rowSelect = {count < 4, (count >= 4) && (count < 8), (count >= 8) && (count < 12), count >= 12};
         // assign odd = (count == 1 | count == 3 | count == 5 | count == 10 );
 endmodule

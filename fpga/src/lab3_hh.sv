@@ -31,7 +31,7 @@ module lab3_hh (
     synchronizer #(3) synchronizerCol(clk, col, sync_cols);
     synchronizer #(3) synchronizerRow(clk, row, sync_rows);
 
-	scanner scanner(clk, reset, scan_en, row, scanCnt);
+	scanner scanner(clk, reset, 1'b1, row, scanCnt);
 
     keymap keymapper(clk, reset, scanCnt, sync_rows, sync_cols, keyMap);
     
