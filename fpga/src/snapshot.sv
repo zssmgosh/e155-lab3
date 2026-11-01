@@ -17,10 +17,12 @@ module snapshot(input logic clk, reset,
                 mapout <= mapin;
         end
             
-    always_comb
+    always_comb begin
         case(state)
-            SCAN: nextstate = (save) ? SAVE : SCAN;
-            SAVE: nextstate = (fetch) ? SCAN : SAVE;
+            SCAN: if (save) nextstate = SAVE; else  nextstate = SCAN;
+            SAVE: if (fetch) nextstate = SCAN; else nextstate = SAVE;
+            default: nextstate = SCAN;
         endcase
+    end
     
 endmodule

@@ -19,6 +19,6 @@ module counter #(parameter N=23, MAX_COUNT=10000000)(
 					end
 				else
 					begin
-						counter <= counter + 1;
+						counter <= counter + 1'b1;
 					end
 endmodule

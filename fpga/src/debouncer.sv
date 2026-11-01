@@ -15,7 +15,15 @@ module debouncer #(parameter N)(
     flopren #(N) flopren6(clk, 1'b1, reset, keymap6, keymap7);
     flopren #(N) flopren7(clk, 1'b1, reset, keymap7, keymap8);
     flopren #(N) flopren8(clk, 1'b1, reset, keymap8, keymap9);
-    flopren #(N) flopren9(clk, 1'b1, reset, keymap9, keymap10);
 
-    assign debounced_keymap = (keymap10 == keymap) ? keymap : 0;
+
+	assign debounced_keymap = (keymap9 == keymap) ? keymap : 0;
+	//always_ff @(posedge clk, negedge reset)
+		//if (~reset)
+			//debounced_keymap <= 0;
+		//else begin
+			//for (int i = 0; i<16; i=i+1) begin
+				//if (keymap1[i]==keymap2[i] && keymap2[i]==keymap3[i] && keymap3[i]==keymap4[i] && keymap4[i]==keymap5[i] && keymap5[i]==keymap6[i] && keymap6[i]==keymap7[i] && keymap7[i]==keymap8[i] && keymap8[i]==keymap9[i]) debounced_keymap[i] <= keymap1[i];
+			//end
+		//end
 endmodule

@@ -12,27 +12,34 @@ module lab3_hh (
 	
 	logic clk, int_osc, scan_en, odd, disp_en, save, fetch;
 	logic [3:0] s, d0, d1, key;
-    logic [15:0] debouncedKeyMap;
+    logic [15:0] keyMap, debouncedKeyMap, saveKeyMap, initKeyMap;
     logic [3:0] sync_rows, sync_cols;
 	logic [17:0] dualSegCount, count;
+    logic [3:0] scanCnt;
 
 	HSOSC #(.CLKHF_DIV(2'b00)) //0b00 is 48MHz
 		hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(int_osc));
 
-	counter #(15, 25000) slow_counter(int_osc, reset, enable, count, clk);
+	counter #(15, 25000) slow_counter(int_osc, reset, enable, count);
+	always_ff @(posedge int_osc, negedge reset) 
+        if (~reset)
+            clk <= 0;
+        else
+            if (count >= 25000)
+                clk <= ~clk;
     // synchronize and debounce keypress input
-    synchronizer #(3) synchronizerCol(clk, col, sync_col);
-    synchronizer #(3) synchronizerRow(clk, row, sync_row);
+    synchronizer #(3) synchronizerCol(clk, col, sync_cols);
+    synchronizer #(3) synchronizerRow(clk, row, sync_rows);
 
-	scanner scanner(clk, reset, scan_en, row, odd);
+	scanner scanner(clk, reset, scan_en, row, scanCnt);
 
-    keymap keymapper(clk, reset, odd, sync_rows, sync_cols, keyMap);
+    keymap keymapper(clk, reset, scanCnt, sync_rows, sync_cols, keyMap);
     
     debouncer #(16) debouncer(clk, reset, keyMap, debouncedKeyMap);
 
-    keypress keypress(clk, reset, debouncedKeyMap, initKeyMap, scan_en, disp_en, save, fetch, saveKeyMap);
-    snapshot keymapSaver(clk, reset, save, fetch, saveKeyMap, initKeyMap);
-
+    // keypress keypress(clk, reset, debouncedKeyMap, initKeyMap, scan_en, disp_en, save, fetch, saveKeyMap);
+    // snapshot keymapSaver(clk, reset, save, fetch, saveKeyMap, initKeyMap);
+    keypress keypress(clk, reset, debouncedKeyMap, scan_en, disp_en);
     keymap_to_key kmtok(debouncedKeyMap, key);
     always_ff @(posedge clk, negedge reset)
         if (~reset) begin
@@ -48,7 +55,7 @@ module lab3_hh (
     // time multiplexed dual segment display
     counter #(17, 100000) counter(int_osc, reset, enable, dualSegCount); //240Hz
 
-    always_ff @(posedge clk, negedge reset) 
+    always_ff @(posedge int_osc, negedge reset) 
         if (~reset)
             anode1 <= 0;
         else

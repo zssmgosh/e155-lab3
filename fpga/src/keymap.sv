@@ -1,9 +1,9 @@
 module keymap(input logic clk, reset,
-              input logic odd,
+              input logic [3:0] count,
               input logic [3:0] rows, cols,
               output logic [15:0] km);
-        flopren #(4) flopr1(clk, (odd && rows[0]), reset, ~cols, km[15:12]);
-        flopren #(4) flopr2(clk, (odd && rows[1]), reset, ~cols, km[11:8]);
-        flopren #(4) flopr3(clk, (odd && rows[2]), reset, ~cols, km[7:4]);
-        flopren #(4) flopr4(clk, (odd && rows[3]), reset, ~cols, km[3:0]);
+        flopren #(4) flopr1(clk, ((count == 1) & rows[0]), reset, ~cols, km[15:12]);
+        flopren #(4) flopr2(clk, ((count == 4) & rows[1]), reset, ~cols, km[11:8]);
+        flopren #(4) flopr3(clk, ((count == 7) & rows[2]), reset, ~cols, km[7:4]);
+        flopren #(4) flopr4(clk, ((count == 10) & rows[3]), reset, ~cols, km[3:0]);
 endmodule
