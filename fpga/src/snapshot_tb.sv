@@ -1,5 +1,5 @@
 // Huanhuan Huang 11/2/2026
-// testbench for keymap
+// testbench for snapshot
 
 `timescale 1 ns/1 ns
 

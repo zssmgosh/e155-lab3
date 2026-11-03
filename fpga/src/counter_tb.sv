@@ -1,9 +1,12 @@
+// Huanhuan Huang 11/2/2026
+// testbench for counter
+
 `timescale 1 ns/1 ns
 
 module counter_tb();
   logic           clk;    // system clock
   logic           reset;  // active high reset
-  logic [4:0]    count;    // 2 output led
+  logic [4:0]     count;    
   logic           enable;
 
     counter #(4, 20) dut(
