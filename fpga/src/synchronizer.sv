@@ -1,3 +1,6 @@
+// Huanhuan Huang 11/2/2026
+// 2 flip flop synchronizer
+
 module synchronizer #(parameter N)(
         input logic clk, 
         input logic [N:0] d,

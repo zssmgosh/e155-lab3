@@ -1,3 +1,6 @@
+// Huanhuan Huang 11/2/2026
+// builds a 16 bit keymap from row and column input
+
 module keymap(input logic clk, reset,
               input logic [3:0] count,
               input logic [3:0] rows, cols,

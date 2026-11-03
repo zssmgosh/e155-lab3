@@ -1,11 +1,14 @@
+// Huanhuan Huang 11/2/2026
+// decides value to be displayed on seven segment given keymap
+
 module keymap_to_key (input logic clk, reset, disp_en,
-        input logic [15:0] keyMap,
+        input logic [15:0] keymap,
         output logic [3:0] d1, d0
     );
 	logic [3:0] key;
 
     always_comb begin
-        case (keyMap)
+        case (keymap)
             16'b0000_0000_0000_0100: key = 4'b0000;
             16'b1000_0000_0000_0000: key = 4'b0001;
             16'b0100_0000_0000_0000: key = 4'b0010;

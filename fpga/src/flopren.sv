@@ -1,3 +1,6 @@
+// Huanhuan Huang 11/2/2026
+// enabled flip flop
+
 module flopren #(parameter WIDTH=4) (input logic clk, en, reset,
                                      input logic [WIDTH-1:0] d,
                                      output logic [WIDTH-1:0] q);

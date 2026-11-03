@@ -1,3 +1,6 @@
+// Huanhuan Huang 11/2/2026
+// FSM that saves a snapshot of a keymap and returns it when asked for
+
 module snapshot(input logic clk, reset,
                 input logic save, fetch,
                 input logic [15:0] mapin,
@@ -13,7 +16,7 @@ module snapshot(input logic clk, reset,
         end
         else begin 
             state <= nextstate;
-            if(save)
+            if(nextstate == SAVE)
                 mapout <= mapin;
         end
             

@@ -1,3 +1,6 @@
+// Huanhuan Huang 11/2/2026
+// FSM controlling keymap display logic
+
 module keypress(
         input logic clk,
         input logic reset,

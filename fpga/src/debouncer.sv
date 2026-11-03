@@ -1,10 +1,13 @@
+// Huanhuan Huang 11/2/2026
+// debouncer module
+
 module debouncer #(parameter N)(
         input logic clk, 
         input logic reset,
         input logic [N-1:0] keymap, 
         output logic [N-1:0] debounced_keymap
     );
-    logic [N-1:0] keymap1, keymap2, keymap3, keymap4, keymap5, keymap6, keymap7, keymap8, keymap9, keymap10;
+    logic [N-1:0] keymap1, keymap2, keymap3, keymap4, keymap5, keymap6, keymap7, keymap8, keymap9;
 
     flopren #(N) flopren0(clk, 1'b1, reset, keymap, keymap1);
     flopren #(N) flopren1(clk, 1'b1, reset, keymap1, keymap2);
