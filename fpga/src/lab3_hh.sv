@@ -10,59 +10,39 @@ module lab3_hh (
         output logic[3:0] row
     );
 	
-	logic clk, int_osc, scan_en, odd, disp_en, save, fetch;
+	logic clk, int_osc, odd, disp_en, save, fetch;
 	logic [3:0] s, d0, d1, key;
-    logic [15:0] keyMap, debouncedKeyMap, saveKeyMap, initKeyMap;
+    logic [15:0] keymap, debounced_keymap, save_keymap, init_keymap;
     logic [3:0] sync_rows, sync_cols;
-	logic [17:0] dualSegCount, count;
-    logic [3:0] scanCnt;
+	logic [17:0] seg_count, count;
+    logic [3:0] scan_count;
 
 	HSOSC #(.CLKHF_DIV(2'b00)) //0b00 is 48MHz
 		hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(int_osc));
 
 	counter #(15, 25000) slow_counter(int_osc, reset, enable, count);
-	always_ff @(posedge int_osc, negedge reset) 
-        if (~reset)
-            clk <= 0;
-        else
-            if (count >= 25000)
-                clk <= ~clk;
+	count_to_toggle #(15, 25000) clkToggle(int_osc, reset, count, clk);
+	
     // synchronize and debounce keypress input
-    synchronizer #(3) synchronizerCol(clk, col, sync_cols);
-    synchronizer #(3) synchronizerRow(clk, row, sync_rows);
+    synchronizer #(3) synchronizer_col(clk, col, sync_cols);
+    synchronizer #(3) synchronizer_row(clk, row, sync_rows);
 
-	scanner scanner(clk, reset, 1'b1, row, scanCnt);
+	scanner scanner(clk, reset, 1'b1, row, scan_count);
 
-    keymap keymapper(clk, reset, scanCnt, sync_rows, sync_cols, keyMap);
+    keymap keymapper(clk, reset, scan_count, sync_rows, sync_cols, keymap);
     
-    debouncer #(16) debouncer(clk, reset, keyMap, debouncedKeyMap);
+    debouncer #(16) debouncer(clk, reset, keymap, debounced_keymap);
 
-    // keypress keypress(clk, reset, debouncedKeyMap, initKeyMap, scan_en, disp_en, save, fetch, saveKeyMap);
-    // snapshot keymapSaver(clk, reset, save, fetch, saveKeyMap, initKeyMap);
-    keypress keypress(clk, reset, debouncedKeyMap, scan_en, disp_en);
-    keymap_to_key kmtok(debouncedKeyMap, key);
-    always_ff @(posedge clk, negedge reset)
-        if (~reset) begin
-            d1 <= 0;
-            d0 <= 0;
-        end
-        else
-            if (disp_en) begin
-                d1 <= d0;
-                d0 <= key;
-            end
-
+    snapshot keymapSaver(clk, reset, save, fetch, save_keymap, init_keymap);
+    keypress keypress(clk, reset, debounced_keymap, init_keymap, disp_en, save, fetch, save_keymap);
+    keymap_to_key kmtok(clk, reset, disp_en, debounced_keymap, d1, d0);
+    
     // time multiplexed dual segment display
-    counter #(17, 100000) counter(int_osc, reset, enable, dualSegCount); //240Hz
+    counter #(17, 100000) counter(int_osc, reset, enable, seg_count); //240Hz
+	count_to_toggle #(17,100000) anodeToggle(int_osc, reset, seg_count, anode1);
 
-    always_ff @(posedge int_osc, negedge reset) 
-        if (~reset)
-            anode1 <= 0;
-        else
-            if (dualSegCount > 100000)
-                anode1 <= ~anode1;
     assign anode2 = ~anode1;
 
-    assign s = anode1 ? d1 : d0;
+    assign s = anode2 ? d1 : d0;
     display display(s, seg);
 endmodule

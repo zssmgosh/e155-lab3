@@ -1,7 +1,8 @@
-module keymap_to_key (
+module keymap_to_key (input logic clk, reset, disp_en,
         input logic [15:0] keyMap,
-        output logic [3:0] key
+        output logic [3:0] d1, d0
     );
+	logic [3:0] key;
 
     always_comb begin
         case (keyMap)
@@ -24,4 +25,15 @@ module keymap_to_key (
             default: key = 4'b0000;
         endcase
     end
+	
+	always_ff @(posedge clk, negedge reset)
+        if (~reset) begin
+            d1 <= 0;
+            d0 <= 0;
+        end
+        else
+            if (disp_en) begin
+                d1 <= d0;
+                d0 <= key;
+            end
 endmodule
